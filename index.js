@@ -36,6 +36,7 @@ function createApiRepo(repoName, endpoint) {
   generateFile('index.ts', `
   import defHttp from '@utilities/apis/${endpoint}/defHttp';
   import { getApiBaseUrl } from '@utilities/apis/utils';
+  import { I${endpoint.replace(/^[a-z]/, endpoint[0].toUpperCase())}BaseResponse } from '@shared/interfaces/api.interface';
   import * as Schema from './${ApiSchema}';
 
   export * from './${ApiSchema}';
@@ -43,10 +44,7 @@ function createApiRepo(repoName, endpoint) {
   const repo = '${repoName}';
   `, repoName);
   generateFile(`${ApiSchema}.ts`,
-    `import { 
-      IBasicApiData,
-      I${endpoint.replace(/^[a-z]/, endpoint[0].toUpperCase())}BaseResponse
-    } from '@shared/interfaces/api.interface';`,
+    `import { IBasicApiData} from '@shared/interfaces/api.interface';`,
     repoName);
 }
 

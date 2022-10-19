@@ -1,0 +1,17 @@
+{
+  "name": "vanilla-cli",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "deploy": "npm install && sudo npm link"
+  },
+  "author": "william.chiang",
+  "license": "ISC",
+  "dependencies": {
+    "commander": "^9.4.1"
+  },
+  "bin": {
+    "vanilla": "./index.js"
+  }
+}

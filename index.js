@@ -44,7 +44,7 @@ function createApiRepo(repoName, endpoint) {
   const repo = '${repoName}';
   `, repoName);
   generateFile(`${ApiSchema}.ts`,
-    `import { IBasicApiData} from '@shared/interfaces/api.interface';`,
+    `import { IApiBaseRvision } from '@shared/interfaces/api.interface';`,
     repoName);
 }
 

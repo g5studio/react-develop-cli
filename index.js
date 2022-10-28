@@ -30,7 +30,6 @@ function resolveGenerateAction(type, name, { endpoint }) {
 }
 
 function createApiRepo(repoName, endpoint) {
-  console.log(endpoint)
   createFolder(repoName);
   const ApiSchema = `${repoName}-${endpoint}.interface`;
   generateFile('index.ts', `
@@ -51,7 +50,13 @@ function createApiRepo(repoName, endpoint) {
 function createModule(moduleName) {
   const BaseModuleFolder = ['components', 'models', 'constants', 'enums', 'hooks', 'interfaces', 'pages'];
   createFolder(moduleName);
-  BaseModuleFolder.forEach(folderName => createFolder(folderName, moduleName));
+  BaseModuleFolder.forEach(folderName => {
+    fs.readdir(folderName, (error, files) => {
+      if (!files) {
+        createFolder(folderName, moduleName);
+      }
+    });
+  });
 }
 
 function createFolder(folderName, root = '.') {

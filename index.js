@@ -6,7 +6,7 @@ const { resolveGenerateAction } = require('./generate');
 program
   .name('vanilla-cli')
   .description('CLI to some JavaScript string utilities')
-  .version('0.0.1');
+  .version('0.0.2');
 
 program.command('g')
   .description('generate')

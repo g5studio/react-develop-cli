@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const { program } = require('commander');
-fs = require('fs');
+const { resolveGenerateAction } = require('./generate');
 
 program
   .name('vanilla-cli')
@@ -13,56 +13,13 @@ program.command('g')
   .argument('<type>', `
     m - module
     a - api
+    c - component
   `)
   .argument('<name>')
+  .option('-p, --path <pathName>', 'specific path', '.')
+  .option('--model', 'add default model into "models" subfolder')
   .option('-ep, --endpoint <endpointName>', 'api repo endpoint', 'saffron')
-  .action((type, name, options) => {
-    resolveGenerateAction(type, name, options);
-  });
+  .action((type, name, options) => resolveGenerateAction(type, name, options));
 
 program.parse();
 
-function resolveGenerateAction(type, name, { endpoint }) {
-  switch (type) {
-    case 'm': createModule(name); break;
-    case 'a': createApiRepo(name, endpoint); break;
-  }
-}
-
-function createApiRepo(repoName, endpoint) {
-  createFolder(repoName);
-  const ApiSchema = `${repoName}-${endpoint}.interface`;
-  generateFile('index.ts', `
-  import defHttp from '@utilities/apis/${endpoint}/defHttp';
-  import { getApiBaseUrl } from '@utilities/apis/utils';
-  import { I${endpoint.replace(/^[a-z]/, endpoint[0].toUpperCase())}BaseRes } from '@shared/interfaces/api.interface';
-  import * as Schema from './${ApiSchema}';
-
-  export * from './${ApiSchema}';
-
-  const repo = '${repoName}';
-  `, repoName);
-  generateFile(`${ApiSchema}.ts`,
-    `import { IApiBaseRvision } from '@shared/interfaces/api.interface';`,
-    repoName);
-}
-
-function createModule(moduleName) {
-  const BaseModuleFolder = ['components', 'models', 'constants', 'enums', 'hooks', 'interfaces', 'pages'];
-  createFolder(moduleName);
-  BaseModuleFolder.forEach(folderName => {
-    fs.readdir(folderName, (error, files) => {
-      if (!files) {
-        createFolder(folderName, moduleName);
-      }
-    });
-  });
-}
-
-function createFolder(folderName, root = '.') {
-  fs.mkdir(`${root}/${folderName}`, err => console.log(err || folderName + ' has generated'));
-}
-
-function generateFile(fileName, content, root = '.') {
-  fs.writeFile(`${root}/${fileName}`, content, err => console.log(err || fileName + ' has generated'));
-}

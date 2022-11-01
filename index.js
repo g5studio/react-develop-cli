@@ -6,7 +6,7 @@ const { resolveGenerateAction } = require('./generate');
 program
   .name('vanilla-cli')
   .description('CLI to some JavaScript string utilities')
-  .version('0.0.2');
+  .version('0.0.3');
 
 program.command('g')
   .description('generate')
@@ -14,6 +14,7 @@ program.command('g')
     m - module
     a - api
     c - component
+    model - model
   `)
   .argument('<name>')
   .option('-p, --path <pathName>', 'specific path', '.')

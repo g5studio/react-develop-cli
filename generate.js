@@ -6,6 +6,7 @@ function resolveGenerateAction(type, name, { endpoint, model, path }) {
         case 'a': createApiRepo(name, endpoint); break;
         case 'c': createComponent(name, { model, path }); break;
         case 'm': createModule(name); break;
+        case 'model': createModel(name); break;
     }
 }
 
@@ -28,24 +29,46 @@ function createApiRepo(repoName, endpoint) {
 }
 
 /**
- * 
+ * 於指定路徑建立元件
  * @param {string} name 元件名稱須符合串烤規則
- * @param {boolean} model 是否於當前子目錄models內生成對應模組
+ * @param {boolean} model 是否於生成對應模型
  * @param {string} path 元件指定路徑，默認當前目錄
  */
 function createComponent(name, { model, path }) {
-    if (model) {
-        fs.readdir('models', (error, files) => {
-            if (!files) {
-                createFolder('models').then(() => generateFile(`${name}.model.ts`, '', 'models'));
-            } else {
-                generateFile(`${name}.model.ts`, '', 'models');
-            }
-        });
-    }
+    if (model) { createModel(name); }
     createFolder(FormatHelper.formatKebabToCamel(name), path).then(root => {
         generateFile(`index.ts`, '', root);
-        generateFile(`index.module.less`, '', root);
+        // generateFile(`index.module.less`, '', root);
+    });
+}
+
+/**
+ * 於當前models子目錄生成模型檔案
+ * @param {string} name model name
+ */
+function createModel(name) {
+    const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
+    const generateModel = () => generateFile(`${name}.model.ts`, `
+    interface I${UpperCamelCase} {
+
+    }
+    
+    /**
+     * @description explan what this model doing here
+     * @implements I${UpperCamelCase}
+     */ 
+    export class ${UpperCamelCase} implements I${UpperCamelCase} {
+        constructor({ ...args }: object) {
+            Object.assign(this, args);
+        }
+    }
+    `, 'models');
+    fs.readdir('models', (error, files) => {
+        if (!files) {
+            createFolder('models').then(() => generateModel());
+        } else {
+            generateModel();
+        }
     });
 }
 

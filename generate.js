@@ -36,8 +36,36 @@ function createApiRepo(repoName, endpoint) {
  */
 function createComponent(name, { model, path }) {
     if (model) { createModel(name); }
-    createFolder(FormatHelper.formatKebabToCamel(name), path).then(root => {
-        generateFile(`index.ts`, '', root);
+    const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
+    createFolder(ComponentCamelName, path).then(root => {
+        generateFile(`index.tsx`, `
+        import { useParams } from "react-router-dom";
+        import { Button, Layout } from 'antd';
+        import Title from 'antd/lib/typography/Title';
+
+        export const ${ComponentCamelName} = () => {
+            const { params } = useParams();
+            return (
+              <div className="flex flex-col h-full p-8 pt-4 bg-[#F0F2F5]">
+                <header className="flex justify-between mb-2">
+                  <Title className="mb-0" level={5}>
+                    ${ComponentCamelName}
+                  </Title>
+                  <Button
+                    className="btnPrimaryOutline"
+                    type="ghost"
+                    onClick={() => { }}
+                  >
+                    Back 
+                  </Button>
+                </header>
+                <Layout className="h-full bg-white pt-3 px-4">
+                    ${ComponentCamelName} Work!
+                </Layout>
+              </div>
+            );
+          };
+        `, root);
         // generateFile(`index.module.less`, '', root);
     });
 }

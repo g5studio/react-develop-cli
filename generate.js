@@ -1,10 +1,10 @@
 fs = require('fs');
 const FormatHelper = require('./heplers/format.helper');
 
-function resolveGenerateAction(type, name, { endpoint, model, path }) {
+function resolveGenerateAction(type, name, { endpoint, model, path, style }) {
     switch (type) {
         case 'a': createApiRepo(name, endpoint); break;
-        case 'c': createComponent(name, { model, path }); break;
+        case 'c': createComponent(name, { model, path, style }); break;
         case 'm': createModule(name); break;
         case 'model': createModel(name); break;
     }
@@ -24,7 +24,7 @@ function createApiRepo(repoName, endpoint) {
     const repo = '${repoName}';
     `, repoName);
     generateFile(`${ApiSchema}.ts`,
-        `import { IApiBaseRvision } from '@shared/interfaces/api.interface';`,
+        `import { IApiBaseRevision } from '@shared/interfaces/api.interface';`,
         repoName);
 }
 
@@ -34,12 +34,17 @@ function createApiRepo(repoName, endpoint) {
  * @param {boolean} model 是否於生成對應模型
  * @param {string} path 元件指定路徑，默認當前目錄
  */
-function createComponent(name, { model, path }) {
+function createComponent(name, { model, path, style }) {
     if (model) { createModel(name); }
     const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
     createFolder(ComponentCamelName, path).then(root => {
+        if (style) {
+            generateFile(`index.module.less`, '', root);
+        }
         generateFile(`index.tsx`, `
         import ContentLayout from '@shared/components/ContentLayout';
+
+        ${style ? "import classes from './index.module.less';" : null}
 
         interface Props {
 
@@ -49,7 +54,6 @@ function createComponent(name, { model, path }) {
 
         export default ${ComponentCamelName};
         `, root);
-        // generateFile(`index.module.less`, '', root);
     });
 }
 

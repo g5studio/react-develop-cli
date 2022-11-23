@@ -18,6 +18,7 @@ program.command('g')
   `)
   .argument('<name>')
   .option('-p, --path <pathName>', 'specific path', '.')
+  .option('--style', 'auto create index.module.less', false)
   .option('--model', 'add default model into "models" subfolder')
   .option('-ep, --endpoint <endpointName>', 'api repo endpoint', 'saffron')
   .action((type, name, options) => resolveGenerateAction(type, name, options));

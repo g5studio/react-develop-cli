@@ -3,29 +3,10 @@ const FormatHelper = require('./heplers/format.helper');
 
 function resolveGenerateAction(type, name, { endpoint, model, path, style }) {
     switch (type) {
-        case 'a': createApiRepo(name, endpoint); break;
         case 'c': createComponent(name, { model, path, style }); break;
         case 'm': createModule(name); break;
         case 'model': createModel(name); break;
     }
-}
-
-function createApiRepo(repoName, endpoint) {
-    createFolder(repoName);
-    const ApiSchema = `${repoName}-${endpoint}.interface`;
-    generateFile('index.ts', `
-    import defHttp from '@utilities/apis/${endpoint}/defHttp';
-    import { getApiBaseUrl } from '@utilities/apis/utils';
-    import { I${endpoint.replace(/^[a-z]/, endpoint[0].toUpperCase())}BaseRes } from '@shared/interfaces/api.interface';
-    import * as Schema from './${ApiSchema}';
-  
-    export * from './${ApiSchema}';
-  
-    const repo = '${repoName}';
-    `, repoName);
-    generateFile(`${ApiSchema}.ts`,
-        `import { IApiBaseRevision } from '@shared/interfaces/api.interface';`,
-        repoName);
 }
 
 /**
@@ -39,12 +20,12 @@ function createComponent(name, { model, path, style }) {
     const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
     createFolder(ComponentCamelName, path).then(root => {
         if (style) {
-            generateFile(`index.module.less`, '', root);
+            generateFile(`index.scss`, '@import "~styles"', root);
         }
         generateFile(`index.tsx`, `
         import ContentLayout from '@shared/components/ContentLayout';
 
-        ${style ? "import classes from './index.module.less';" : null}
+        ${style ? "import './style.scss'" : ""}
 
         interface Props {
 

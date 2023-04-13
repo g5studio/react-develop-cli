@@ -18,23 +18,15 @@ function resolveGenerateAction(type, name, { endpoint, model, path, style }) {
 function createComponent(name, { model, path, style }) {
     if (model) { createModel(name); }
     const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
+    const FileImport = `import ContentLayout from '@shared/components/ContentLayout';\n${style ?
+        "import './style.scss';" : ""
+        }\ninterface Props {\n}`;
+    const ComponentTemplate = `const ${ComponentCamelName} = (props: Props) =>  (<ContentLayout title="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);`
     createFolder(ComponentCamelName, path).then(root => {
         if (style) {
-            generateFile(`index.scss`, '@import "~styles"', root);
+            generateFile(`style.scss`, '@import "~styles";', root);
         }
-        generateFile(`index.tsx`, `
-        import ContentLayout from '@shared/components/ContentLayout';
-
-        ${style ? "import './style.scss'" : ""}
-
-        interface Props {
-
-        }
-
-        const ${ComponentCamelName} = (props: Props) =>  (<ContentLayout title="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);
-
-        export default ${ComponentCamelName};
-        `, root);
+        generateFile(`index.tsx`, `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`, root);
     });
 }
 
@@ -45,20 +37,20 @@ function createComponent(name, { model, path, style }) {
 function createModel(name) {
     const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
     const generateModel = () => generateFile(`${name}.model.ts`, `
-    interface I${UpperCamelCase} {
+interface I${UpperCamelCase} {
 
+}
+
+/**
+ * @description explan what this model doing here
+ * @implements I${UpperCamelCase}
+ */ 
+export class ${UpperCamelCase} implements I${UpperCamelCase} {
+    constructor({ ...args }: object) {
+        Object.assign(this, args);
     }
-    
-    /**
-     * @description explan what this model doing here
-     * @implements I${UpperCamelCase}
-     */ 
-    export class ${UpperCamelCase} implements I${UpperCamelCase} {
-        constructor({ ...args }: object) {
-            Object.assign(this, args);
-        }
-    }
-    `, 'models');
+}
+`, 'models');
     fs.readdir('models', (error, files) => {
         if (!files) {
             createFolder('models').then(() => generateModel());

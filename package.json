@@ -12,6 +12,6 @@
     "commander": "^9.4.1"
   },
   "bin": {
-    "vanilla": "./index.js"
+    "toolbox": "./index.js"
   }
 }

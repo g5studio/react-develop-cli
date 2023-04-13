@@ -18,10 +18,9 @@ function resolveGenerateAction(type, name, { endpoint, model, path, style }) {
 function createComponent(name, { model, path, style }) {
     if (model) { createModel(name); }
     const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
-    const FileImport = `import ContentLayout from '@shared/components/ContentLayout';\n${style ?
-        "import './style.scss';" : ""
-        }\ninterface Props {\n}`;
-    const ComponentTemplate = /Page$/.test(ComponentCamelName) ?
+    const IsPage = /Page$/.test(ComponentCamelName);
+    const FileImport = `${IsPage ? "import ContentLayout from '@shared/components/ContentLayout';\n" : ''}${style ? "import './style.scss';" : ""}\ninterface Props {\n}`;
+    const ComponentTemplate = IsPage ?
         `const ${ComponentCamelName} = (props: Props) => (<ContentLayout title="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);` :
         `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
     createFolder(ComponentCamelName, path).then(root => {

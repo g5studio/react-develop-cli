@@ -21,7 +21,9 @@ function createComponent(name, { model, path, style }) {
     const FileImport = `import ContentLayout from '@shared/components/ContentLayout';\n${style ?
         "import './style.scss';" : ""
         }\ninterface Props {\n}`;
-    const ComponentTemplate = `const ${ComponentCamelName} = (props: Props) =>  (<ContentLayout title="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);`
+    const ComponentTemplate = /Page$/.test(ComponentCamelName) ?
+        `const ${ComponentCamelName} = (props: Props) => (<ContentLayout title="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);` :
+        `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
     createFolder(ComponentCamelName, path).then(root => {
         if (style) {
             generateFile(`style.scss`, '@import "~styles";', root);

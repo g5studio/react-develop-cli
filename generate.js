@@ -25,7 +25,7 @@ function createComponent(name, { model, path, style }) {
         `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
     createFolder(ComponentCamelName, path).then(root => {
         if (style) {
-            generateFile(`style.scss`, '@import "~styles";', root);
+            generateFile(`style.scss`, '@import "~styles/variables";', root);
         }
         generateFile(`index.tsx`, `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`, root);
     });

@@ -1,9 +1,9 @@
 fs = require('fs');
 const FormatHelper = require('./heplers/format.helper');
 
-function resolveGenerateAction(type, name, { endpoint, model, path, style }) {
+function resolveGenerateAction(type, name, { test, model, path, style }) {
     switch (type) {
-        case 'c': createComponent(name, { model, path, style }); break;
+        case 'c': createComponent(name, { model, path, style, test }); break;
         case 'm': createModule(name); break;
         case 'model': createModel(name); break;
     }
@@ -14,8 +14,10 @@ function resolveGenerateAction(type, name, { endpoint, model, path, style }) {
  * @param {string} name 元件名稱須符合串烤規則
  * @param {boolean} model 是否於生成對應模型
  * @param {string} path 元件指定路徑，默認當前目錄
+ * @param {string} style 是否生成樣式檔案
+ * @param {string} test 是否生成測試檔案
  */
-function createComponent(name, { model, path, style }) {
+function createComponent(name, { model, path, style, test }) {
     if (model) { createModel(name); }
     const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
     const IsPage = /Page$/.test(ComponentCamelName);
@@ -26,6 +28,11 @@ function createComponent(name, { model, path, style }) {
     createFolder(ComponentCamelName, path).then(root => {
         if (style) {
             generateFile(`style.scss`, '@import "~styles/variables";', root);
+        }
+        if (test) {
+            const TestTarget = IsPage ? 'Page' : 'Component';
+            const BaseUITest = `it('Should Render', async () => {render(<${TestTarget} />\n);expect(screen.getByTestId('Guideline')).not.toBeNull();\n});`
+            generateFile('index.test.tsx', `import ${IsPage ? 'Page' : 'Component'} from ".";\nimport { render, screen } from "@testing-library/react";\ndescribe('UI test', () => {\n${BaseUITest}\n });\ndescribe('Feature test', () => { });`, root);
         }
         generateFile(`index.tsx`, `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`, root);
     });

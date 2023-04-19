@@ -16,6 +16,7 @@ program.command('g')
     model - model
   `)
   .argument('<name>')
+  .option('--test', 'auto create test.ts')
   .option('-p, --path <pathName>', 'specific path', '.')
   .option('--style', 'auto create style.scss')
   .option('--model', 'add default model into "models" subfolder')

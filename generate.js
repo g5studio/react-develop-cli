@@ -31,7 +31,7 @@ function createComponent(name, { model, path, style, test }) {
         }
         if (test) {
             const TestTarget = IsPage ? 'Page' : 'Component';
-            const BaseUITest = `it('Should Render', async () => {render(<${TestTarget} />\n);expect(screen.getByTestId('Guideline')).not.toBeNull();\n});`
+            const BaseUITest = `it('Should Render', async () => {render(<${TestTarget} />\n);expect(screen.getByTestId('${ComponentCamelName}')).not.toBeNull();\n});`
             generateFile('index.test.tsx', `import ${IsPage ? 'Page' : 'Component'} from ".";\nimport { render, screen } from "@testing-library/react";\ndescribe('UI test', () => {\n${BaseUITest}\n });\ndescribe('Feature test', () => { });`, root);
         }
         generateFile(`index.tsx`, `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`, root);

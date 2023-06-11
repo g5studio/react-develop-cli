@@ -27,7 +27,7 @@ function createComponent(name, { model, path, style, test }) {
         `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
     createFolder(ComponentCamelName, path).then(root => {
         if (style) {
-            generateFile(`style.scss`, `@import "~styles/variables";\n.${IsPage ? 'page' : 'compnent'}-${name.replace(/-page$/, '')}{\n}`, root);
+            generateFile(`style.scss`, `@import "~styles/variables";\n.${IsPage ? 'page' : 'component'}-${name.replace(/-page$/, '')}{\n}`, root);
         }
         if (test) {
             const TestTarget = IsPage ? 'Page' : 'Component';

@@ -4,7 +4,7 @@ const { program } = require('commander');
 const { resolveGenerateAction } = require('./generate');
 
 program
-  .name('g5-developer-cli')
+  .name('g5-toolbox-cli')
   .description('CLI to some JavaScript string utilities')
   .version('0.0.4');
 

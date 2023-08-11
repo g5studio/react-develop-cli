@@ -1,12 +1,19 @@
-fs = require('fs');
-const FormatHelper = require('./heplers/format.helper');
+fs = require("fs");
+const FormatHelper = require("./heplers/format.helper");
+const modelTemplate = require("./templates/model-template");
 
 function resolveGenerateAction(type, name, { test, model, path, style }) {
-    switch (type) {
-        case 'c': createComponent(name, { model, path, style, test }); break;
-        case 'm': createModule(name); break;
-        case 'model': createModel(name); break;
-    }
+  switch (type) {
+    case "c":
+      createComponent(name, { model, path, style, test });
+      break;
+    case "m":
+      createModule(name);
+      break;
+    case "model":
+      createModel(name);
+      break;
+  }
 }
 
 /**
@@ -18,24 +25,46 @@ function resolveGenerateAction(type, name, { test, model, path, style }) {
  * @param {string} test 是否生成測試檔案
  */
 function createComponent(name, { model, path, style, test }) {
-    if (model) { createModel(name); }
-    const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
-    const IsPage = /Page$/.test(ComponentCamelName);
-    const FileImport = `${IsPage ? "import ContentLayout from '@shared/components/ContentLayout';\n" : ''}${style ? "import './style.scss';" : ""}\ninterface Props {\n}`;
-    const ComponentTemplate = IsPage ?
-        `const ${ComponentCamelName} = (props: Props) => (<ContentLayout testId="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);` :
-        `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
-    createFolder(ComponentCamelName, path).then(root => {
-        if (style) {
-            generateFile(`style.scss`, `@import "~styles/variables";\n.${IsPage ? 'page' : 'component'}-${name.replace(/-page$/, '')}{\n}`, root);
-        }
-        if (test) {
-            const TestTarget = IsPage ? 'Page' : 'Component';
-            const BaseUITest = `it('Should render', async () => {render(<${TestTarget} />\n);expect(screen.getByTestId('${ComponentCamelName}')).not.toBeNull();\n});`
-            generateFile('index.test.tsx', `import ${IsPage ? 'Page' : 'Component'} from ".";\nimport { render, screen } from "@testing-library/react";\ndescribe('UI test', () => {\n${BaseUITest}\n });\ndescribe('Feature test', () => { });`, root);
-        }
-        generateFile(`index.tsx`, `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`, root);
-    });
+  if (model) {
+    createModel(name);
+  }
+  const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
+  const IsPage = /Page$/.test(ComponentCamelName);
+  const FileImport = `${
+    IsPage
+      ? "import ContentLayout from '@shared/components/ContentLayout';\n"
+      : ""
+  }${style ? "import './style.scss';" : ""}\ninterface Props {\n}`;
+  const ComponentTemplate = IsPage
+    ? `const ${ComponentCamelName} = (props: Props) => (<ContentLayout testId="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);`
+    : `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
+  createFolder(ComponentCamelName, path).then((root) => {
+    if (style) {
+      generateFile(
+        `style.scss`,
+        `@import "~styles/variables";\n.${
+          IsPage ? "page" : "component"
+        }-${name.replace(/-page$/, "")}{\n}`,
+        root
+      );
+    }
+    if (test) {
+      const TestTarget = IsPage ? "Page" : "Component";
+      const BaseUITest = `it('Should render', async () => {render(<${TestTarget} />\n);expect(screen.getByTestId('${ComponentCamelName}')).not.toBeNull();\n});`;
+      generateFile(
+        "index.test.tsx",
+        `import ${
+          IsPage ? "Page" : "Component"
+        } from ".";\nimport { render, screen } from "@testing-library/react";\ndescribe('UI test', () => {\n${BaseUITest}\n });\ndescribe('Feature test', () => { });`,
+        root
+      );
+    }
+    generateFile(
+      `index.tsx`,
+      `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`,
+      root
+    );
+  });
 }
 
 /**
@@ -43,41 +72,36 @@ function createComponent(name, { model, path, style, test }) {
  * @param {string} name model name
  */
 function createModel(name) {
-    const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
-    const generateModel = () => generateFile(`${name}.model.ts`, `
-interface I${UpperCamelCase} {
-
-}
-
-/**
- * @description explan what this model doing here
- * @implements I${UpperCamelCase}
- */ 
-export class ${UpperCamelCase} implements I${UpperCamelCase} {
-    constructor({ ...args }: object) {
-        Object.assign(this, args);
+  const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
+  const generateModel = () =>
+    generateFile(`${name}.model.ts`, modelTemplate(UpperCamelCase), "models");
+  fs.readdir("models", (error, files) => {
+    if (!files) {
+      createFolder("models").then(() => generateModel());
+    } else {
+      generateModel();
     }
-}
-`, 'models');
-    fs.readdir('models', (error, files) => {
-        if (!files) {
-            createFolder('models').then(() => generateModel());
-        } else {
-            generateModel();
-        }
-    });
+  });
 }
 
 function createModule(moduleName) {
-    const BaseModuleFolder = ['components', 'models', 'constants', 'enums', 'hooks', 'interfaces', 'pages'];
-    createFolder(moduleName);
-    BaseModuleFolder.forEach(folderName => {
-        fs.readdir(folderName, (error, files) => {
-            if (!files) {
-                createFolder(folderName, moduleName);
-            }
-        });
+  const BaseModuleFolder = [
+    "components",
+    "models",
+    "constants",
+    "enums",
+    "hooks",
+    "interfaces",
+    "pages",
+  ];
+  createFolder(moduleName);
+  BaseModuleFolder.forEach((folderName) => {
+    fs.readdir(folderName, (error, files) => {
+      if (!files) {
+        createFolder(folderName, moduleName);
+      }
     });
+  });
 }
 
 /**
@@ -86,23 +110,25 @@ function createModule(moduleName) {
  * @param {string} root 目錄路徑
  */
 function createFolder(folderName, root) {
-    const Path = `${root || '.'}/${folderName}`;
-    return new Promise((resolve, reject) => {
-        fs.mkdir(Path, error => {
-            console.log(error || folderName + ' has generated');
-            error ? reject(error) : resolve(Path);
-        });
+  const Path = `${root || "."}/${folderName}`;
+  return new Promise((resolve, reject) => {
+    fs.mkdir(Path, (error) => {
+      console.log(error || folderName + " has generated");
+      error ? reject(error) : resolve(Path);
     });
+  });
 }
 
-/** 
+/**
  * 於指定路徑生成指定檔案
  * @param {string} fileName 檔案名稱
- * @param {string} content 檔案內容 
+ * @param {string} content 檔案內容
  * @param {string} root 檔案路徑
  */
-function generateFile(fileName, content, root = '.') {
-    fs.writeFile(`${root}/${fileName}`, content, error => console.log(error || fileName + ' has generated'));
+function generateFile(fileName, content, root = ".") {
+  fs.writeFile(`${root}/${fileName}`, content, (error) =>
+    console.log(error || fileName + " has generated")
+  );
 }
 
 module.exports = { resolveGenerateAction };

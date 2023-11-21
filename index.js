@@ -1,26 +1,36 @@
 #!/usr/bin/env node
 
-const { program } = require('commander');
-const { resolveGenerateAction } = require('./generate');
+const { program } = require("commander");
+const { resolveGenerateAction } = require("./generate");
+const { resolveSetupAction } = require("./setup");
 
 program
-  .name('g5-toolbox-cli')
-  .description('CLI to some JavaScript string utilities')
-  .version('0.0.4');
+  .name("g5-toolbox-cli")
+  .description("CLI to some JavaScript string utilities")
+  .version("0.0.4");
 
-program.command('g')
-  .description('generate')
-  .argument('<type>', `
+program
+  .command("set")
+  .description("set up config", "framework - support framework")
+  .arguments("<key> <value>")
+  .action((key, value) => resolveSetupAction(key, value));
+
+program
+  .command("g")
+  .description("generate")
+  .argument(
+    "<type>",
+    `
     m - module
     c - component
     model - model
-  `)
-  .argument('<name>')
-  .option('--test', 'auto create test.ts')
-  .option('-p, --path <pathName>', 'specific path', '.')
-  .option('--style', 'auto create style.scss')
-  .option('--model', 'add default model into "models" subfolder')
+  `
+  )
+  .argument("<name>")
+  .option("--test", "auto create test.ts")
+  .option("-p, --path <pathName>", "specific path", ".")
+  .option("--style", "auto create style.scss")
+  .option("--model", 'add default model into "models" subfolder')
   .action((type, name, options) => resolveGenerateAction(type, name, options));
 
 program.parse();
-

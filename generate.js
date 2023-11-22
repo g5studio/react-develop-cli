@@ -4,8 +4,10 @@ const FormatHelper = require("./utilities/helpers/format.helper");
 const FileHelper = require("./utilities/helpers/file.helper");
 const ReactModelGenerator = require(`./utilities/templates/react/model-template`);
 const ReactComponentGenerator = require(`./utilities/templates/react/component-template`);
+const ReactTestGenerator = require(`./utilities/templates/react/test-template`);
 const SolidModelGenerator = require(`./utilities/templates/solid/model-template`);
 const SolidComponentGenerator = require(`./utilities/templates/solid/component-template`);
+const SolidTestGenerator = require(`./utilities/templates/solid/test-template`);
 
 function resolveGenerateAction(type, name, { test, model, path, style }) {
   switch (type) {
@@ -33,7 +35,7 @@ async function createComponent(name, { model, path, style, test }) {
   if (model) {
     createModel(name);
   }
-  const { framework, styleModule } = await loadConfig();
+  const { framework, styleModule, testTool } = await loadConfig();
   const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
   const IsPage = /Page$/.test(ComponentCamelName);
   const StyleFileName = style
@@ -54,27 +56,31 @@ async function createComponent(name, { model, path, style, test }) {
           styleModule,
         });
   FileHelper.createFolder(ComponentCamelName, path).then((root) => {
+    FileHelper.generateFile(`index.tsx`, ComponentTemplate, root);
     if (style) {
       FileHelper.generateFile(
         StyleFileName,
-        `@import "~styles/variables";\n.${
+        `// !class for specific component or page should follow BEM rule\n.${
           IsPage ? "page" : "component"
         }-${name.replace(/-page$/, "")}{\n}`,
         root
       );
     }
     if (test) {
-      const TestTarget = IsPage ? "Page" : "Component";
-      const BaseUITest = `it('Should render', async () => {render(<${TestTarget} />\n);expect(screen.getByTestId('${ComponentCamelName}')).not.toBeNull();\n});`;
-      FileHelper.generateFile(
-        "index.test.tsx",
-        `import ${
-          IsPage ? "Page" : "Component"
-        } from ".";\nimport { render, screen } from "@testing-library/react";\ndescribe('UI test', () => {\n${BaseUITest}\n });\ndescribe('Feature test', () => { });`,
-        root
-      );
+      const TestTemplate =
+        framework === "solid"
+          ? SolidTestGenerator({
+              name: ComponentCamelName,
+              isPage: IsPage,
+              testTool,
+            })
+          : ReactTestGenerator({
+              name: ComponentCamelName,
+              isPage: IsPage,
+              testTool,
+            });
+      FileHelper.generateFile("index.test.tsx", TestTemplate, root);
     }
-    FileHelper.generateFile(`index.tsx`, ComponentTemplate, root);
   });
 }
 
@@ -130,6 +136,7 @@ async function loadConfig() {
   let config = {
     framework: "react",
     styleModule: false,
+    testTool: "jest",
   };
   await FileHelper.readFile("toolbox-config.json", process.env.root).then(
     (data) => {

@@ -24,7 +24,7 @@ function resolveGenerateAction(type, name, { test, model, path, style }) {
 }
 
 /**
- * 於指定路徑建立元件
+ * 於指定路徑建立元件，並自動註冊到
  * @param {string} name 元件名稱須符合串烤規則
  * @param {boolean} model 是否於生成對應模型
  * @param {string} path 元件指定路徑，默認當前目錄
@@ -81,6 +81,7 @@ async function createComponent(name, { model, path, style, test }) {
             });
       FileHelper.generateFile("index.test.tsx", TestTemplate, root);
     }
+    registerComponent(ComponentCamelName);
   });
 }
 
@@ -129,7 +130,7 @@ function createModule(moduleName) {
 }
 
 /**
- *
+ * 載入當前專案配置檔案
  * @returns config
  */
 async function loadConfig() {
@@ -144,6 +145,21 @@ async function loadConfig() {
     }
   );
   return config;
+}
+
+/**
+ * 將元件註冊至母資料夾下index.ts
+ * @param name camel name
+ */
+function registerComponent(name) {
+  const exportInfo = `export * from './${name}';`;
+  fs.readFile("index.ts", (error, data) => {
+    if (!error) {
+      FileHelper.generateFile("index.ts", `${data}${exportInfo}`);
+    } else {
+      FileHelper.generateFile("index.ts", `${data}${exportInfo}`);
+    }
+  });
 }
 
 module.exports = { resolveGenerateAction };

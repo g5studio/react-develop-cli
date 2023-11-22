@@ -1,7 +1,7 @@
 const FileHelper = require("./utilities/helpers/file.helper");
 
 function resolveSetupAction(type, value) {
-  FileHelper.readFile("toolbox-config.js")
+  FileHelper.readFile("toolbox-config.js", process.env.root)
     .then((data) => {
       FileHelper.generateFile(
         "toolbox-config.json",
@@ -10,7 +10,8 @@ function resolveSetupAction(type, value) {
           ...{
             [type]: value,
           },
-        })
+        }),
+        process.env.root
       );
     })
     .catch((error) => {
@@ -19,7 +20,8 @@ function resolveSetupAction(type, value) {
           "toolbox-config.json",
           JSON.stringify({
             [type]: value,
-          })
+          }),
+          process.env.root
         );
       }
     });

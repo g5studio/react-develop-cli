@@ -1,7 +1,11 @@
 fs = require("fs");
+
 const FormatHelper = require("./utilities/helpers/format.helper");
 const FileHelper = require("./utilities/helpers/file.helper");
-const modelTemplate = require("./utilities/templates/model-template");
+const ReactModelGenerator = require(`./utilities/templates/react/model-template`);
+const ReactComponentGenerator = require(`./utilities/templates/react/component-template`);
+const SolidModelGenerator = require(`./utilities/templates/solid/model-template`);
+const SolidComponentGenerator = require(`./utilities/templates/solid/component-template`);
 
 function resolveGenerateAction(type, name, { test, model, path, style }) {
   switch (type) {
@@ -25,24 +29,34 @@ function resolveGenerateAction(type, name, { test, model, path, style }) {
  * @param {string} style 是否生成樣式檔案
  * @param {string} test 是否生成測試檔案
  */
-function createComponent(name, { model, path, style, test }) {
+async function createComponent(name, { model, path, style, test }) {
   if (model) {
     createModel(name);
   }
+  const { framework, styleModule } = await loadConfig();
   const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
   const IsPage = /Page$/.test(ComponentCamelName);
-  const FileImport = `${
-    IsPage
-      ? "import ContentLayout from '@shared/components/ContentLayout';\n"
-      : ""
-  }${style ? "import './style.scss';" : ""}\ninterface Props {\n}`;
-  const ComponentTemplate = IsPage
-    ? `const ${ComponentCamelName} = (props: Props) => (<ContentLayout testId="${ComponentCamelName}">${ComponentCamelName} Worked!</ContentLayout>);`
-    : `const ${ComponentCamelName} = (props: Props) => (<div>${ComponentCamelName} Worked!</div>);`;
+  const StyleFileName = style
+    ? `index${styleModule ? ".module" : ""}.scss`
+    : "";
+  const ComponentTemplate =
+    framework === "solid"
+      ? SolidComponentGenerator({
+          name: ComponentCamelName,
+          styleName: StyleFileName,
+          isPage: IsPage,
+          styleModule,
+        })
+      : ReactComponentGenerator({
+          name: ComponentCamelName,
+          styleName: StyleFileName,
+          isPage: IsPage,
+          styleModule,
+        });
   FileHelper.createFolder(ComponentCamelName, path).then((root) => {
     if (style) {
       FileHelper.generateFile(
-        `style.scss`,
+        StyleFileName,
         `@import "~styles/variables";\n.${
           IsPage ? "page" : "component"
         }-${name.replace(/-page$/, "")}{\n}`,
@@ -60,11 +74,7 @@ function createComponent(name, { model, path, style, test }) {
         root
       );
     }
-    FileHelper.generateFile(
-      `index.tsx`,
-      `${FileImport}\n${ComponentTemplate}\nexport default ${ComponentCamelName};`,
-      root
-    );
+    FileHelper.generateFile(`index.tsx`, ComponentTemplate, root);
   });
 }
 
@@ -72,14 +82,15 @@ function createComponent(name, { model, path, style, test }) {
  * 於當前models子目錄生成模型檔案
  * @param {string} name model name
  */
-function createModel(name) {
+async function createModel(name) {
   const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
+  const { framework } = await loadConfig();
+  const template =
+    framework === "solid"
+      ? SolidModelGenerator(UpperCamelCase)
+      : ReactModelGenerator(UpperCamelCase);
   const generateModel = () =>
-    FileHelper.generateFile(
-      `${name}.model.ts`,
-      modelTemplate(UpperCamelCase),
-      "models"
-    );
+    FileHelper.generateFile(`${name}.model.ts`, template, "models");
   fs.readdir("models", (error, files) => {
     if (!files) {
       FileHelper.createFolder("models").then(() => generateModel());
@@ -109,6 +120,23 @@ function createModule(moduleName) {
       }
     });
   });
+}
+
+/**
+ *
+ * @returns config
+ */
+async function loadConfig() {
+  let config = {
+    framework: "react",
+    styleModule: false,
+  };
+  await FileHelper.readFile("toolbox-config.json", process.env.root).then(
+    (data) => {
+      config = { ...config, ...data };
+    }
+  );
+  return config;
 }
 
 module.exports = { resolveGenerateAction };

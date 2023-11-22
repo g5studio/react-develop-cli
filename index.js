@@ -3,6 +3,11 @@
 const { program } = require("commander");
 const { resolveGenerateAction } = require("./generate");
 const { resolveSetupAction } = require("./setup");
+process.env["root"] = `../${process
+  .cwd()
+  .split("src")[1]
+  .replace(/[\w]+/g, "..")
+  .replace(/^\//, "")}`;
 
 program
   .name("g5-toolbox-cli")

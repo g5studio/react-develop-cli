@@ -1,0 +1,26 @@
+/**
+ * 生成solid框架元件模板
+ * @param {string} name camel name
+ * @param {string} styleName 樣式檔案名稱，不傳則不生成樣式
+ * @default 'style.scss'
+ * @param {string} isPage 是否為頁面元件
+ * @param {boolean} styleModule 是否為scss模組
+ * @returns 元件模板
+ */
+const getTemplate = ({ name, styleName, isPage, styleModule }) => {
+  const FileImport = `${
+    isPage
+      ? "import ContentLayout from '@shared/components/ContentLayout';\n"
+      : ""
+  }${
+    styleName
+      ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`
+      : ""
+  }interface Props {\n}\n`;
+  const ComponentTemplate = isPage
+    ? `const ${name} = (props: Props) => (<ContentLayout testId="${name}">${name} Worked!</ContentLayout>);`
+    : `const ${name} = (props: Props) => (<div>${name} Worked!</div>);`;
+  return `${FileImport}\n${ComponentTemplate}\nexport default ${name};`;
+};
+
+module.exports = getTemplate;

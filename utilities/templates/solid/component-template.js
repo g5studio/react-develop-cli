@@ -19,7 +19,7 @@ const getTemplate = ({ name, styleName, isPage, styleModule }) => {
   }interface Props ${isPage ? "" : "extends IBaseComponentProps"} {\n}\n`;
   const ComponentTemplate = isPage
     ? `const ${name} = (props: Props) => (<ContentLayout testId="${name}">${name} Worked!</ContentLayout>);`
-    : `const ${name} = ({ testId }: Props) => (<div data-testid = {testId}>${name} Worked!</div>);`;
+    : `const ${name} = (props: Props) => (<div data-testid = {props.testId}>${name} Worked!</div>);`;
   return `${FileImport}\n${ComponentTemplate}\nexport default ${name};`;
 };
 

@@ -1,13 +1,13 @@
 fs = require("fs");
 
-const FormatHelper = require("./utilities/helpers/format.helper");
-const FileHelper = require("./utilities/helpers/file.helper");
-const ReactModelGenerator = require(`./utilities/templates/react/model-template`);
-const ReactComponentGenerator = require(`./utilities/templates/react/component-template`);
-const ReactTestGenerator = require(`./utilities/templates/react/test-template`);
-const SolidModelGenerator = require(`./utilities/templates/solid/model-template`);
-const SolidComponentGenerator = require(`./utilities/templates/solid/component-template`);
-const SolidTestGenerator = require(`./utilities/templates/solid/test-template`);
+const FormatHelper = require("../utilities/helpers/format.helper");
+const FileHelper = require("../utilities/helpers/file.helper");
+const ReactModelGenerator = require(`../utilities/templates/react/model-template`);
+const ReactComponentGenerator = require(`../utilities/templates/react/component-template`);
+const ReactTestGenerator = require(`../utilities/templates/react/test-template`);
+const SolidModelGenerator = require(`../utilities/templates/solid/model-template`);
+const SolidComponentGenerator = require(`../utilities/templates/solid/component-template`);
+const SolidTestGenerator = require(`../utilities/templates/solid/test-template`);
 
 function resolveGenerateAction(type, name, { test, model, path, style }) {
   switch (type) {

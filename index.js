@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const { program } = require("commander");
-const { resolveGenerateAction } = require("./generate");
-const { resolveSetupAction } = require("./setup");
+const { resolveGenerateAction } = require("./commands/generate");
+const { resolveSetupAction } = require("./commands/setup");
 process.env["root"] = `../${process
   .cwd()
   .split("src")[1]

@@ -1,4 +1,4 @@
-const FileHelper = require("./utilities/helpers/file.helper");
+const FileHelper = require("../utilities/helpers/file.helper");
 
 function resolveSetupAction(type, value) {
   FileHelper.readFile("toolbox-config.js", process.env.root)

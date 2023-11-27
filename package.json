@@ -1,6 +1,6 @@
 {
   "name": "g5-toolbox-cli",
-  "version": "0.0.5",
+  "version": "1.0.0",
   "description": "quick build g5 pattern project",
   "main": "index.js",
   "scripts": {

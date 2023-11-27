@@ -6,7 +6,7 @@ const { resolveSetupAction } = require("./commands/setup");
 process.env["root"] = `../${process
   .cwd()
   .split("src")[1]
-  .replace(/[\w]+/g, "..")
+  .replace(/[\w|-]+/g, "..")
   .replace(/^\//, "")}`;
 
 program

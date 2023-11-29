@@ -11,13 +11,13 @@ const getTemplate = ({ name, isPage, testTool }) => {
       ? "import { describe, it, expect } from 'vitest';\n"
       : ""
   }${
-    isPage && "import { Router } from '@solidjs/router';\n"
+    isPage ? "import { Router } from '@solidjs/router';\n" : ""
   }import { render, screen } from '@solidjs/testing-library';`;
   const TestTarget = `import ${isPage ? "Page" : "Component"} from '.';`;
   const BaseUITest = `it('Should render',() => {render(() => ${
-    isPage && "<Router>"
+    isPage ? "<Router>" : ""
   }<${isPage ? "Page" : `Component testId = "${name}"`} />${
-    isPage && "</Router>"
+    isPage ? "</Router>" : ""
   }\n);expect(screen.getByTestId('${name}')).not.toBeNull();\n});`;
 
   return `${TestLibrary}\n\n${TestTarget}\n\ndescribe('UI test', () => {\n${BaseUITest}\n });`;

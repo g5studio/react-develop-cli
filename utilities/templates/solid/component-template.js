@@ -8,19 +8,21 @@
  * @returns 元件模板
  */
 const getTemplate = ({ name, styleName, isPage, styleModule }) => {
-  const FileImport = `${
-    isPage
-      ? "import ContentLayout from '@shared/components/ContentLayout';\n"
-      : "import { IBaseComponentProps } from '@shared/interfaces/base-component.interface';\n\n"
-  }${
+  const ComponentFileImport = `import { IBaseComponentProps } from '@shared/interfaces/base-component.interface';\n\n${
     styleName
       ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`
       : ""
-  }interface Props ${isPage ? "" : "extends IBaseComponentProps"} {\n}\n`;
-  const ComponentTemplate = isPage
-    ? `const ${name} = (props: Props) => (<ContentLayout testId="${name}">${name} Worked!</ContentLayout>);`
-    : `const ${name} = (props: Props) => (<div data-testid = {props.testId}>${name} Worked!</div>);`;
-  return `${FileImport}\n${ComponentTemplate}\nexport default ${name};`;
+  }export interface I${name}Props extends IBaseComponentProps {\n}\n`;
+  const PageFileImport = `import ContentLayout from '@shared/components/ContentLayout';\n${
+    styleName
+      ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`
+      : ""
+  }\n`;
+  const PageTemplate = `const ${name} = () => (<ContentLayout testId="${name}">${name} Worked!</ContentLayout>);`;
+  const ComponentTemplate = `const ${name} = (props: I${name}Props) => (<div data-testid = {props.testId}>${name} Worked!</div>);`;
+  return `${isPage ? PageFileImport : ComponentFileImport}\n${
+    isPage ? PageTemplate : ComponentTemplate
+  }\nexport default ${name};`;
 };
 
 module.exports = getTemplate;

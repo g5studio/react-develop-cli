@@ -33,7 +33,7 @@ function resolveGenerateAction(type, name, { test, model, path, style }) {
  */
 async function createComponent(name, { model, path, style, test }) {
   if (model) {
-    createModel(name);
+    createModel(name, "../models");
   }
   const { framework, styleModule, testTool } = await loadConfig();
   const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
@@ -81,15 +81,18 @@ async function createComponent(name, { model, path, style, test }) {
             });
       FileHelper.generateFile("index.test.tsx", TestTemplate, root);
     }
-    registerComponent(ComponentCamelName);
+    register(ComponentCamelName);
   });
 }
 
 /**
- * 於當前models子目錄生成模型檔案
+ * 於指定目錄生成模型檔案，預設當前資料夾內models子目錄
  * @param {string} name model name
  */
-async function createModel(name) {
+async function createModel(name, rootPath = "./models") {
+  if (/models$/.test(process.cwd())) {
+    rootPath = ".";
+  }
   const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
   const { framework } = await loadConfig();
   const template =
@@ -97,13 +100,14 @@ async function createModel(name) {
       ? SolidModelGenerator(UpperCamelCase)
       : ReactModelGenerator(UpperCamelCase);
   const generateModel = () =>
-    FileHelper.generateFile(`${name}.model.ts`, template, "models");
-  fs.readdir("models", (error, files) => {
+    FileHelper.generateFile(`${name}.model.ts`, template, rootPath);
+  fs.readdir(rootPath, (error, files) => {
     if (!files) {
       FileHelper.createFolder("models").then(() => generateModel());
     } else {
       generateModel();
     }
+    register(`${name}.model`, rootPath);
   });
 }
 
@@ -148,16 +152,18 @@ async function loadConfig() {
 }
 
 /**
- * 將元件註冊至母資料夾下index.ts
- * @param name camel name
+ * 註冊至index.ts
+ * @param name camel case name
+ * @param rootPath 指定目錄，預設當前目錄
  */
-function registerComponent(name) {
+function register(name, rootPath = ".") {
   const exportInfo = `export * from './${name}';`;
-  fs.readFile("index.ts", (error, data) => {
+  const path = `${rootPath}/index.ts`;
+  fs.readFile(path, (error, data) => {
     if (!error) {
-      FileHelper.generateFile("index.ts", `${data}${exportInfo}`);
+      FileHelper.generateFile(path, `${data}${exportInfo}`);
     } else {
-      FileHelper.generateFile("index.ts", `${data}${exportInfo}`);
+      FileHelper.generateFile(path, `${data}${exportInfo}`);
     }
   });
 }

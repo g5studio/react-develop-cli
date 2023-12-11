@@ -8,11 +8,16 @@ const ReactTestGenerator = require(`../utilities/templates/react/test-template`)
 const SolidModelGenerator = require(`../utilities/templates/solid/model-template`);
 const SolidComponentGenerator = require(`../utilities/templates/solid/component-template`);
 const SolidTestGenerator = require(`../utilities/templates/solid/test-template`);
+const SolidStoryBookGenerator = require("../utilities/templates/solid/storybook-template");
 
-function resolveGenerateAction(type, name, { test, model, path, style }) {
+function resolveGenerateAction(
+  type,
+  name,
+  { test, model, path, style, storybook }
+) {
   switch (type) {
     case "c":
-      createComponent(name, { model, path, style, test });
+      createComponent(name, { model, path, style, test, storybook });
       break;
     case "m":
       createModule(name);
@@ -28,10 +33,11 @@ function resolveGenerateAction(type, name, { test, model, path, style }) {
  * @param {string} name 元件名稱須符合串烤規則
  * @param {boolean} model 是否於生成對應模型
  * @param {string} path 元件指定路徑，默認當前目錄
- * @param {string} style 是否生成樣式檔案
- * @param {string} test 是否生成測試檔案
+ * @param {boolean} style 是否生成樣式檔案
+ * @param {boolean} test 是否生成測試檔案
+ * @param {boolean} storybook 是否生成故事檔案
  */
-async function createComponent(name, { model, path, style, test }) {
+async function createComponent(name, { model, path, style, test, storybook }) {
   if (model) {
     createModel(name, "../models");
   }
@@ -55,6 +61,7 @@ async function createComponent(name, { model, path, style, test }) {
           isPage: IsPage,
           styleModule,
         });
+
   FileHelper.createFolder(ComponentCamelName, path).then((root) => {
     FileHelper.generateFile(`index.tsx`, ComponentTemplate, root);
     if (style) {
@@ -80,6 +87,14 @@ async function createComponent(name, { model, path, style, test }) {
               testTool,
             });
       FileHelper.generateFile("index.test.tsx", TestTemplate, root);
+    }
+    if (storybook & (framework === "solid")) {
+      const Template = SolidStoryBookGenerator({ name: ComponentCamelName });
+      FileHelper.generateFile(
+        `${ComponentCamelName}.stories.tsx`,
+        Template,
+        root
+      );
     }
     register(ComponentCamelName);
   });

@@ -12,7 +12,7 @@ process.env["root"] = `../${process
 program
   .name("g5-toolbox-cli")
   .description("CLI for quick build g5 pattern project")
-  .version("1.0.6");
+  .version("1.0.7");
 
 program
   .command("set")
@@ -36,6 +36,7 @@ program
   .option("-p, --path <pathName>", "specific path", ".")
   .option("--style", "auto create style.scss")
   .option("--model", 'add default model into "models" subfolder')
+  .option("--storybook", "generate storybook template")
   .action((type, name, options) => resolveGenerateAction(type, name, options));
 
 program.parse();

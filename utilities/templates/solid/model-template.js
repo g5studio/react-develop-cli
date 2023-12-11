@@ -4,7 +4,7 @@
  */
 const getTemplate = (name) => {
   const FileImportTemplate =
-    "import { IBaseModel } from '@shared/interfaces/base-model.interface';\nimport { createStore, produce } from 'solid-js/store';";
+    "import { IBaseModel } from '@shared/interfaces/base-model.interface';\nimport { createStore, reconcile } from 'solid-js/store';";
   const SchemaTemplate = `
   type ${name} = {\n// TODO design your model meta data here , please remove this line before commit \n};
   export interface I${name} extends IBaseModel<unknown, ${name}> {}
@@ -21,13 +21,13 @@ const getTemplate = (name) => {
   
     // !no need to change
     const updateData = (data: Partial<${name}>) => {
-      setData(produce((pre) => ({ ...pre, ...data })));
+      setData(data);
       return metaData;
     };
   
     // !no need to change
     const reset = () => {
-      setData(initialData);
+      setData(reconcile(initialData));
     };
   
     return { metaData, updateData, initialize, reset };

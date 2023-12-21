@@ -6,7 +6,7 @@
 const getTemplate = ({ name }) => {
   const Template = `import type { Meta, StoryObj } from 'storybook-solidjs';
 
-    import Component, { I${name}Props } from './index';
+    import Component from './index';
     
     const meta: Meta<typeof Component> = {
       component: Component,
@@ -19,15 +19,16 @@ const getTemplate = ({ name }) => {
     
     type Story = StoryObj<typeof Component>;
     
-    const Template = (props: I${name}Props) => <Component {...props} />;
-    
     /*
      *👇 Render functions are a framework specific feature to allow you control on how the component renders.
      * See https://storybook.js.org/docs/solid/api/csf
      * to learn how to use render functions.
      */
-    export const Base${name}Demo: Story = Template.bind({}) as Story;
-    // TODO configure your story props here , Demo.args = {};
+    export const Base${name}Demo: Story = {
+      args: {
+        // TODO configure your story props here 
+      },
+    };
     `;
 
   return Template;

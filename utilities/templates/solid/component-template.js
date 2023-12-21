@@ -19,7 +19,7 @@ const getTemplate = ({ name, styleName, isPage, styleModule }) => {
       : ""
   }\n`;
   const PageTemplate = `const ${name} = () => (<ContentLayout testId="${name}">${name} Worked!</ContentLayout>);`;
-  const ComponentTemplate = `const ${name} = (props: I${name}Props) => (<div data-testid = {props.testId}>${name} Worked!</div>);`;
+  const ComponentTemplate = `const ${name} = (props: I${name}Props) => (<div data-testid = {props.testId}  classList={props.classList}  class={props.classes}>${name} Worked!</div>);`;
   return `${isPage ? PageFileImport : ComponentFileImport}\n${
     isPage ? PageTemplate : ComponentTemplate
   }\nexport default ${name};`;

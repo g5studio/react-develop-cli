@@ -12,7 +12,7 @@ const getTemplate = ({ name, styleName, isPage, styleModule }) => {
     styleName
       ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`
       : ""
-  }export interface I${name}Props extends IBaseComponentProps {\n}\n`;
+  }interface I${name}Props extends IBaseComponentProps {\n}\n`;
   const PageFileImport = `import ContentLayout from '@shared/components/ContentLayout';\n${
     styleName
       ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`

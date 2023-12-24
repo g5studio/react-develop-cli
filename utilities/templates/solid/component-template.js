@@ -8,7 +8,7 @@
  * @returns 元件模板
  */
 const getTemplate = ({ name, styleName, isPage, styleModule }) => {
-  const ComponentFileImport = `import { IBaseComponentProps } from '@shared/interfaces/base-component.interface';\n\n${
+  const ComponentFileImport = `import { IBaseComponentProps } from '@shared/interfaces/base-component.interface';\nimport { formatClassList, formatClasses } from '@utilities/helpers/format-helper';\n\n${
     styleName
       ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`
       : ""
@@ -19,7 +19,7 @@ const getTemplate = ({ name, styleName, isPage, styleModule }) => {
       : ""
   }\n`;
   const PageTemplate = `const ${name} = () => (<ContentLayout testId="${name}">${name} Worked!</ContentLayout>);`;
-  const ComponentTemplate = `const ${name} = (props: I${name}Props) => (<div data-testid = {props.testId}  classList={props.classList}  class={props.classes}>${name} Worked!</div>);`;
+  const ComponentTemplate = `const ${name} = (props: I${name}Props) => (<div data-testid = {props.testId} class={formatClasses(props.classes)}>${name} Worked!</div>);`;
   return `${isPage ? PageFileImport : ComponentFileImport}\n${
     isPage ? PageTemplate : ComponentTemplate
   }\nexport default ${name};`;

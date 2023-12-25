@@ -8,7 +8,7 @@
  * @returns 元件模板
  */
 const getTemplate = ({ name, styleName, isPage, styleModule }) => {
-  const ComponentFileImport = `import { IBaseComponentProps } from '@shared/interfaces/base-component.interface';\nimport { formatClassList, formatClasses } from '@utilities/helpers/format-helper';\n\n${
+  const ComponentFileImport = `import { IBaseComponentProps } from '@shared/interfaces/base-component.interface';\nimport { formatClasses } from '@utilities/helpers/format-helper';\n\n${
     styleName
       ? `import ${styleModule ? "style from" : " "}'./${styleName}';\n\n`
       : ""

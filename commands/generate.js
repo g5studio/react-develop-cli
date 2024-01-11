@@ -41,7 +41,7 @@ async function createComponent(name, { model, path, style, test, storybook }) {
   if (model) {
     createModel(name, "../models");
   }
-  const { framework, styleModule, testTool } = await loadConfig();
+  const { framework, styleModule, testTool, autoRegister } = await loadConfig();
   const ComponentCamelName = FormatHelper.formatKebabToCamel(name);
   const IsPage = /Page$/.test(ComponentCamelName);
   const StyleFileName = style
@@ -96,7 +96,9 @@ async function createComponent(name, { model, path, style, test, storybook }) {
         root
       );
     }
-    register(ComponentCamelName);
+    if (autoRegister) {
+      register(ComponentCamelName);
+    }
   });
 }
 
@@ -109,7 +111,7 @@ async function createModel(name, rootPath = "./models") {
     rootPath = ".";
   }
   const UpperCamelCase = FormatHelper.formatKebabToCamel(name);
-  const { framework } = await loadConfig();
+  const { framework, autoRegister } = await loadConfig();
   const template =
     framework === "solid"
       ? SolidModelGenerator(UpperCamelCase)
@@ -122,7 +124,9 @@ async function createModel(name, rootPath = "./models") {
     } else {
       generateModel();
     }
-    register(`${name}.model`, rootPath);
+    if (autoRegister) {
+      register(`${name}.model`, rootPath);
+    }
   });
 }
 
@@ -157,6 +161,7 @@ async function loadConfig() {
     framework: "react",
     styleModule: false,
     testTool: "jest",
+    autoRegister: true,
   };
   await FileHelper.readFile("toolbox-config.json", process.env.root).then(
     (data) => {

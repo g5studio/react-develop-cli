@@ -12,7 +12,7 @@ process.env["root"] = `../${process
 program
   .name("g5-toolbox-cli")
   .description("CLI for quick build g5 pattern project")
-  .version("1.1.4");
+  .version("1.1.5");
 
 program
   .command("set")
